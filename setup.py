@@ -6,7 +6,7 @@ setup(
     install_requires=["requests", "qrcode"],
     entry_points={
         "console_scripts": [
-            "dcheck=dscanner.main:main",
+            "dscan=dscanner.console_script:main",
         ],
     }
 )
