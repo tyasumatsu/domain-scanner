@@ -1,5 +1,5 @@
 import qrcode
-from .constants import ALPHABETS
+from dscanner.constants import ALPHABETS
 
 def make_word(string):
     qr = qrcode.QRCode(version=2)
