@@ -1,8 +1,8 @@
 import tldextract
 # 単体で実行した時用の書き方?
-from constants import ALPHABETS
+#from constants import ALPHABETS
 # 単体で実行した時は明示的なrelative importが上手くうごかない...?　
-#from .constants import ALPHABETS
+from .constants import ALPHABETS
 import itertools
 
 

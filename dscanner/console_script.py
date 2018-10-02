@@ -1,18 +1,19 @@
 import sys
 import argparse
 
-import qr
-import suffix
-import bit
-import typo
+# 単体で実行するとき用
+#import qr
+#import suffix
+#import bit
+#import typo
 #import homo
 #import combo
 
 # 本番用
-#from . import qr
-#from . import suffix
-#from . import bit
-#from . import typo
+from . import qr
+from . import suffix
+from . import bit
+from . import typo
 #from . import homo
 #from . import combo
 
@@ -42,6 +43,7 @@ def main():
         for domain_name in domain_list:
             domain_info_dict = {}
             domain_info_dict["domain_name"] = domain_name
+            
             # httpレスポンス情報を付加する
             if args.http:
                 # TODO: httpステータスコードの取得をもっとマシなものにする
@@ -62,6 +64,7 @@ def main():
                     # エラーにならないのは本当に200だけか...?301とかもあるかもしれないがとりあえず200
                     http_status_code = 200
                 domain_info_dict["http_status_code"] = http_status_code
+            
             # 追加例：
             # geoip情報を付加する
             # if args.geoip:
@@ -72,4 +75,5 @@ def main():
 
     print(json.dumps(result_dict, indent=4, separators=(',', ': ')) )
 
-main()
+if __name__ == '__main__':
+    main()
