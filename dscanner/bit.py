@@ -39,10 +39,12 @@ def near_urls(FQDN):
     cand_FQDN = []
     # www.example.comでいうexampleの部分が1bit反転したもの
     for cand in cand_domains_inverted:
-        cand_FQDN.append(subdomain +"."+ cand +"."+ suffix)
+        cand_FQDN.append( '.'.join(part for part in [subdomain, cand, suffix] if part) )
+        #cand_FQDN.append(subdomain +"."+ cand +"."+ suffix)
     # www.example.comでいうwwwの部分が1bit反転したもの
     for cand in cand_subdomains_inverted:
-        cand_FQDN.append(cand +"." + domain +"."+ suffix)
+        cand_FQDN.append( '.'.join(part for part in [cand, domain, suffix] if part) )
+        #cand_FQDN.append(cand +"." + domain +"."+ suffix)
 
     return cand_FQDN
 
