@@ -1,7 +1,5 @@
 # coding: utf-8
-import re
 import urllib
-import pickle
 from bs4 import BeautifulSoup
 
 # ICANN公式のnew gTLDの一覧ページ
@@ -11,10 +9,11 @@ ICANN_URL = "https://newgtlds.icann.org/en/program-status/delegated-strings"
 def get_soup(url):
     html = urllib.request.urlopen(url)
     soup = BeautifulSoup(html, "html.parser")
+
     return soup
 
- # ICANN公式からnew gTLDのリストを抜いてくる
- # むしろnew gTLDに絞ってチェックした方が良いのかもしれない（悪用率が高いため）
+# ICANN公式からnew gTLDのリストを抜いてくる
+# むしろnew gTLDに絞ってチェックした方が良いのかもしれない（悪用率が高いため）
 def get_new_gtld(url):
     new_gtld = []
     soup = get_soup(url)
@@ -32,6 +31,7 @@ def get_new_gtld(url):
                 tld = "xn--cg4bki"
             tld = tld.lower()
             new_gtld.append(tld)
+
     return new_gtld
 
 # http://data.iana.org/TLD/tlds-alpha-by-domain.txt よりTLDの一覧を入手できる
@@ -43,6 +43,7 @@ def get_all_tld(file_name):
         while line:
             all_tld.append(line[:-1].lower())
             line = f.readline()
+            
     return all_tld[1:]
 
 if __name__  == "__main__":
