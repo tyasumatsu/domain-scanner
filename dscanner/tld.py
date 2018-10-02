@@ -2,9 +2,6 @@
 import urllib
 from bs4 import BeautifulSoup
 
-# ICANN公式のnew gTLDの一覧ページ
-ICANN_URL = "https://newgtlds.icann.org/en/program-status/delegated-strings"
-
 # htmlを抽出する
 def get_soup(url):
     html = urllib.request.urlopen(url)
@@ -43,10 +40,13 @@ def get_all_tld(file_name):
         while line:
             all_tld.append(line[:-1].lower())
             line = f.readline()
-            
+
     return all_tld[1:]
 
 if __name__  == "__main__":
+    # ICANN公式のnew gTLDの一覧ページ
+    ICANN_URL = "https://newgtlds.icann.org/en/program-status/delegated-strings"
+
     new_gtld = get_new_gtld(ICANN_URL)
     all_tld = get_all_tld("./TLD.txt")
     target_tld = set(all_tld)|set(new_gtld) # チェック対象TLD（set型）
