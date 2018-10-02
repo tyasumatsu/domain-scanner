@@ -1,13 +1,20 @@
 import sys
 import argparse
-#from . import qr
+
 import qr
+import suffix
+import bit
+import typo
+#import homo
+#import combo
+
+# 本番用
+#from . import qr
+#from . import suffix
 #from . import bit
 #from . import typo
 #from . import homo
 #from . import combo
-
-#import suffix
 
 import urllib.request
 import urllib.error
@@ -22,12 +29,12 @@ def main():
 
     # URL候補を取得
     domains_dict = {}
-    domains_dict["qr"] = qr.near_urls(args.domain_name)[:15]
-    #domains_dict["suffix"] = suffix.main
-    #domains_dict["bit"] = bit.near_urls(args.domain_name)
-    #domains_dict["typo"] = typo.near_urls(args.domain_name)
-    #result_dict["homo"] = homo.near_urls(domain)
-    #result_dict["combo"] = combo.near_urls(domain)
+    domains_dict["qr"]     = qr.near_urls(args.domain_name)[:3]
+    domains_dict["suffix"] = suffix.generate_domain(args.domain_name)[:3]
+    domains_dict["bit"]   = bit.near_urls(args.domain_name)[:3]
+    domains_dict["typo"]  = typo.near_urls(args.domain_name)[:3]
+    #domains_dict["homo"]   = homo.near_urls(domain)
+    #domains_dict["combo"]  = combo.near_urls(domain)
     
     result_dict = {}
     for domain_type_name, domain_list in domains_dict.items():
@@ -37,10 +44,11 @@ def main():
             domain_info_dict["domain_name"] = domain_name
             # httpレスポンス情報を付加する
             if args.http:
-                http_status_code = 0
+                # TODO: httpステータスコードの取得をもっとマシなものにする
                 # https://stackoverflow.com/questions/1726402/in-python-how-do-i-use-urllib-to-see-if-a-website-is-404-or-200
+                http_status_code = 0
                 try:
-                    _ = urllib.request.urlopen("http://" + domain_name, timeout=0.5)
+                    urllib.request.urlopen("http://" + domain_name, timeout=0.5)
                 except urllib.error.HTTPError as e:
                     http_status_code = e.code
                 # connection refusedなどになった場合。後でもっとうまく変えたほうがよいかも
@@ -51,17 +59,17 @@ def main():
                 except ConnectionResetError:
                     http_status_code = -1
                 else:
-                    # ほんとに200だけか？
+                    # エラーにならないのは本当に200だけか...?301とかもあるかもしれないがとりあえず200
                     http_status_code = 200
                 domain_info_dict["http_status_code"] = http_status_code
-            # 例：
+            # 追加例：
             # geoip情報を付加する
             # if args.geoip:
             #     domain_info_dict["geoip"] = country
+
             domain_info_list.append(domain_info_dict)
         result_dict[domain_type_name] = domain_info_list
 
     print(json.dumps(result_dict, indent=4, separators=(',', ': ')) )
 
-                
 main()
