@@ -3,8 +3,8 @@ import tldextract
 #from constants import ALPHABETS
 # 単体で実行した時は明示的なrelative importが上手くうごかない...?　
 from .constants import ALPHABETS
-import itertools
 
+import itertools
 
 # pythonはUTF-8で文字を扱うが、URLはネットワーク機器ではIDN(国際化ドメイン名)でもピュニコードとか使って結局asciiの範囲で扱われる？のかよくわからないがとりあえずasciiに合わせて8bit
 # とりあえず1bitだけ反転。複数bit反転が必要なら後で直します
