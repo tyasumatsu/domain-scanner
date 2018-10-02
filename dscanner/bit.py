@@ -1,8 +1,8 @@
 import tldextract
 # 単体で実行した時用の書き方?
-from constants import ALPHABETS
+#from constants import ALPHABETS
 # 単体で実行した時は明示的なrelative importが上手くうごかない...?　
-#from .constants import ALPHABETS
+from .constants import ALPHABETS
 import itertools
 
 
@@ -39,10 +39,12 @@ def near_urls(FQDN):
     cand_FQDN = []
     # www.example.comでいうexampleの部分が1bit反転したもの
     for cand in cand_domains_inverted:
-        cand_FQDN.append(subdomain +"."+ cand +"."+ suffix)
+        cand_FQDN.append( '.'.join(part for part in [subdomain, cand, suffix] if part) )
+        #cand_FQDN.append(subdomain +"."+ cand +"."+ suffix)
     # www.example.comでいうwwwの部分が1bit反転したもの
     for cand in cand_subdomains_inverted:
-        cand_FQDN.append(cand +"." + domain +"."+ suffix)
+        cand_FQDN.append( '.'.join(part for part in [cand, domain, suffix] if part) )
+        #cand_FQDN.append(cand +"." + domain +"."+ suffix)
 
     return cand_FQDN
 
