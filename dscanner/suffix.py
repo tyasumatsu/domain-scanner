@@ -11,8 +11,18 @@ def get_soup(url):
 
     return soup
 
+# TLDのリストを作成する
+def make_list():
+    res = get_soup(SUFFIX_URL).text.split("\n")
+    tmp = [suffix for suffix in res if suffix != ""]
+    tld_list = [suffix if "*" not in suffix else suffix.split(".")[-1] for suffix in tmp if suffix[0] != "/"]
+
+    return tld_list
+
+
 # TLDを付け替える
-def generate_domain(domain, tld_list):
+def generate_domain(domain):
+    tld_list = make_list()
     if "www." in domain:
         domain = domain.split(".")[1]
     else:
@@ -21,16 +31,6 @@ def generate_domain(domain, tld_list):
 
     return check_list
 
-
-def main():
-    res = get_soup(SUFFIX_URL).text.split("\n")
-    tmp = [suffix for suffix in res if suffix != ""]
-    tld_list = [suffix if "*" not in suffix else suffix.split(".")[-1] for suffix in tmp if suffix[0] != "/"]
-    domain = input("Your domain?: ")
-    check_list = generate_domain(domain, tld_list)
-
-    return check_list
-
 if __name__  == "__main__":
-    check_list = main()
+    check_list = generate_domain("example.com")
     print(check_list)
