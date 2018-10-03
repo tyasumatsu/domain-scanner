@@ -109,6 +109,13 @@ def main():
             
             # Google Safe Brawsingの情報を取得
             if len(args.safe_site)>0:
+                # TODO: 今使われてなくてもドメインの過去の情報を知ることができるが、ほんとにいらない？
+                # 今使われていないドメインの場合はスキップ
+                if "http_status_code" in domain_info_dict:
+                    if domain_info_dict["http_status_code"] != 200:
+                        domain_info_dict["site_threat"] = []
+                        continue
+
                 api_key_gsb = args.safe_site
                 sbl = SafeBrowsingList(api_key_gsb)
                 threat_list = sbl.lookup_url(domain_name)
@@ -119,6 +126,13 @@ def main():
 
             # VirusTotalの情報を取得
             if len(args.virustotal)>0:
+                # TODO: 今使われてなくてもドメインの過去の情報を知ることができるが、ほんとにいらない？
+                # 今使われていないドメインの場合はスキップ
+                if "http_status_code" in domain_info_dict:
+                    if domain_info_dict["http_status_code"] != 200:
+                        domain_info_dict["virus_total"] = {}
+                        continue
+
                 api_key_vt = args.virustotal
 
                 # TODO:関数とかに後でする
