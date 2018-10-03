@@ -38,7 +38,7 @@ def fetch_pdns_domain_info(domain_name, apikey):
     return response_dict
 
 def print_progress(progress_string):
-    print(progress_string)
+    print(progress_string, file=sys.stderr)
 
 def main():
     # 引数の解釈の準備
@@ -52,14 +52,19 @@ def main():
     # URL候補を取得
     generator_dict = {}
     # TODO: 練習用にリストの長さを制限しているが、本番のときは制限をなくす
+    # TODO: 同じような内容が反復されているので上手くまとめる(呼ぶ関数が違うので単純にforにはしにくいけど)
     print_progress("generating qr ...")
     generator_dict["qr"]     = qr.near_urls(args.domain_name)[:1]
+    print_progress("generated: " + str(len(generator_dict["qr"])))
     print_progress("generating suffix ...")
     generator_dict["suffix"] = suffix.generate_domain(args.domain_name)[:1]
+    print_progress("generated: " + str(len(generator_dict["suffix"])))
     print_progress("generating bit ...")
     generator_dict["bit"]   = bit.near_urls(args.domain_name)[:1]
+    print_progress("generated: " +str( len(generator_dict["bit"])))
     print_progress("generating typo ...")
     generator_dict["typo"]  = typo.near_urls(args.domain_name)[:1]
+    print_progress("generated: " + str(len(generator_dict["typo"])))
     #domains_dict["homo"]   = homo.near_urls(domain)
     #domains_dict["combo"]  = combo.near_urls(domain)
     
