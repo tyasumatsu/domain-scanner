@@ -51,7 +51,7 @@ def generate_domain(domain):
     # else:
     #     domain = domain.split(".")[0]
 
-    # 単純にTLDだけを付け替える実装にする
+    # 単純にTLDだけを付け替える実装にする（co.jp　→ co.xyz）
     check_list = [".".join(domain.split(".")[:-1]) + "." + tld for tld in tld_list]
 
     return check_list
