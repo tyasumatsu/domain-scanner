@@ -37,6 +37,7 @@ def fetch_pdns_domain_info(domain_name, apikey):
     return response_dict
 
 def main():
+    # 引数の解釈の準備
     p = argparse.ArgumentParser()
     p.add_argument("domain_name")
     p.add_argument('-g', '--http', action="store_true", help="Get http response by each candidate domains")
@@ -44,28 +45,32 @@ def main():
     p.add_argument('--virustotal', default="", help="Get google safe sites tool information. must be followed by api key. VERY SLOW ")
     args = p.parse_args()
 
-    # initialization ... いるの？
-    # if args.safe_site:
-    #     sbl = SafeBrowsingList('dummy')
-    #     sbl.update_hash_prefix_cache()
-
     # URL候補を取得
-    domains_dict = {}
+    generator_dict = {}
     # TODO: 練習用にリストの長さを制限しているが、本番のときは制限をなくす
-    domains_dict["qr"]     = qr.near_urls(args.domain_name)[:1]
-    domains_dict["suffix"] = suffix.generate_domain(args.domain_name)[:1]
-    domains_dict["bit"]   = bit.near_urls(args.domain_name)[:1]
-    domains_dict["typo"]  = typo.near_urls(args.domain_name)[:1]
+    generator_dict["qr"]     = qr.near_urls(args.domain_name)[:1]
+    generator_dict["suffix"] = suffix.generate_domain(args.domain_name)[:1]
+    generator_dict["bit"]   = bit.near_urls(args.domain_name)[:1]
+    generator_dict["typo"]  = typo.near_urls(args.domain_name)[:1]
     #domains_dict["homo"]   = homo.near_urls(domain)
     #domains_dict["combo"]  = combo.near_urls(domain)
     
-    result_dict = {}
-    for domain_type_name, domain_list in domains_dict.items():
-        domain_info_list = []
+    # 辞書形式でドメインの情報らを持つ
+    domains_dict = {}
+    for generate_type_name, domain_list in generator_dict.items():
         for domain_name in domain_list:
-            domain_info_dict = {}
-            domain_info_dict["domain_name"] = domain_name
+            if domain_name not in domains_dict:
+                domains_dict[domain_name] = {}
+                # 冗長だがあとでjsonに変換するときに必要
+                domains_dict[domain_name]["domain_name"] = domain_name
             
+            if "generate_type" not in domains_dict[domain_name] :
+                domains_dict[domain_name]["generate_type"] = []
+            
+            domains_dict[domain_name]["generate_type"].append(generate_type_name)
+
+    # ドメインに関する情報を調べ、記録していく
+    for domain_name, domain_info_dict in domains_dict.items():            
             # httpレスポンス情報を付加する
             if args.http:
                 # TODO: httpステータスコードの取得をもっとマシなものにする
@@ -87,6 +92,7 @@ def main():
                     http_status_code = 200
                 domain_info_dict["http_status_code"] = http_status_code
             
+            # Google Safe Brawsingの情報を取得
             if len(args.safe_site)>0:
                 api_key_gsb = args.safe_site
                 sbl = SafeBrowsingList(api_key_gsb)
@@ -96,6 +102,7 @@ def main():
                 else: 
                     domain_info_dict["site_threat"] = threat_list
 
+            # VirusTotalの情報を取得
             if len(args.virustotal)>0:
                 api_key_vt = args.virustotal
 
@@ -120,11 +127,12 @@ def main():
             # geoip情報を付加する
             # if args.geoip:
             #     domain_info_dict["geoip"] = country
+    
+    print_list = []
+    for domain_info_dict in domains_dict.values():
+        print_list.append(domain_info_dict)
 
-            domain_info_list.append(domain_info_dict)
-        result_dict[domain_type_name] = domain_info_list
-
-    print(json.dumps(result_dict, indent=4, separators=(',', ': ')) )
+    print(json.dumps(print_list, indent=4, separators=(',', ': ')) )
 
 if __name__ == '__main__':
     main()
