@@ -21,19 +21,40 @@ import urllib.request
 import urllib.error
 import json
 import socket 
+from bs4 import BeautifulSoup
+import socket
+import urllib
+from urllib.request import urlopen
+from gglsbl import SafeBrowsingList
+
+def fetch_pdns_domain_info(domain_name, apikey):
+    url = 'https://www.virustotal.com/vtapi/v2/domain/report'
+    parameters = {'domain': domain_name, 'apikey': apikey}
+    response = urlopen('%s?%s' % (url, urllib.parse.urlencode(parameters))).read()
+
+    response_dict = json.loads(response)
+    return response_dict
 
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("domain_name")
     p.add_argument('-g', '--http', action="store_true", help="Get http response by each candidate domains")
+    p.add_argument('--safe_site', default="", help="Get google safe sites tool information. must be followed by api key ")
+    p.add_argument('--virustotal', default="", help="Get google safe sites tool information. must be followed by api key ")
     args = p.parse_args()
+
+    # initialization ... いるの？
+    # if args.safe_site:
+    #     sbl = SafeBrowsingList('dummy')
+    #     sbl.update_hash_prefix_cache()
 
     # URL候補を取得
     domains_dict = {}
-    domains_dict["qr"]     = qr.near_urls(args.domain_name)[:3]
-    domains_dict["suffix"] = suffix.generate_domain(args.domain_name)[:3]
-    domains_dict["bit"]   = bit.near_urls(args.domain_name)[:3]
-    domains_dict["typo"]  = typo.near_urls(args.domain_name)[:3]
+    # TODO: 練習用にリストの長さを制限しているが、本番のときは制限をなくす
+    domains_dict["qr"]     = qr.near_urls(args.domain_name)[:1]
+    domains_dict["suffix"] = suffix.generate_domain(args.domain_name)[:1]
+    domains_dict["bit"]   = bit.near_urls(args.domain_name)[:1]
+    domains_dict["typo"]  = typo.near_urls(args.domain_name)[:1]
     #domains_dict["homo"]   = homo.near_urls(domain)
     #domains_dict["combo"]  = combo.near_urls(domain)
     
@@ -64,6 +85,19 @@ def main():
                     # エラーにならないのは本当に200だけか...?301とかもあるかもしれないがとりあえず200
                     http_status_code = 200
                 domain_info_dict["http_status_code"] = http_status_code
+            
+            if len(args.safe_site)>0:
+                api_key_gsb = args.safe_site
+                sbl = SafeBrowsingList(api_key_gsb)
+                threat_list = sbl.lookup_url(domain_name)
+                if threat_list == None:
+                    domain_info_dict["site_threat"] = []
+                else: 
+                    domain_info_dict["site_threat"] = threat_list
+
+            if len(args.virustotal)>0:
+                api_key_vt = args.virustotal
+                domain_info_dict["virus_total"] = fetch_pdns_domain_info(domain_name, api_key_vt)["Webutation domain info"]
             
             # 追加例：
             # geoip情報を付加する
