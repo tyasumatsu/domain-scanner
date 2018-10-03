@@ -24,8 +24,10 @@
 	    ]
 	}
 ## Generate and check domains with Virus Total
-`dscan <domainname> --http --virustotal <here VirusTotal API key>`
+`dscan <domainname> --http --virustotal <here VirusTotal API key>`  
+VERY SLOW.  
 ### Result
+
 	{
 	    "qr": [
 	        {

@@ -26,6 +26,7 @@ import socket
 import urllib
 from urllib.request import urlopen
 from gglsbl import SafeBrowsingList
+import time
 
 def fetch_pdns_domain_info(domain_name, apikey):
     url = 'https://www.virustotal.com/vtapi/v2/domain/report'
@@ -40,7 +41,7 @@ def main():
     p.add_argument("domain_name")
     p.add_argument('-g', '--http', action="store_true", help="Get http response by each candidate domains")
     p.add_argument('--safe_site', default="", help="Get google safe sites tool information. must be followed by api key ")
-    p.add_argument('--virustotal', default="", help="Get google safe sites tool information. must be followed by api key ")
+    p.add_argument('--virustotal', default="", help="Get google safe sites tool information. must be followed by api key. VERY SLOW ")
     args = p.parse_args()
 
     # initialization ... いるの？
@@ -97,8 +98,24 @@ def main():
 
             if len(args.virustotal)>0:
                 api_key_vt = args.virustotal
-                domain_info_dict["virus_total"] = fetch_pdns_domain_info(domain_name, api_key_vt)["Webutation domain info"]
-            
+
+                # TODO:関数とかに後でする
+                interval_seconds_virustotal = 60/4
+                retry_max_time = 2
+                retry_sleep_seconds_virustotal = 1
+                for _ in range(retry_max_time):
+                    try:
+                        info_virustotal = fetch_pdns_domain_info(domain_name, api_key_vt)
+                    except:
+                        # virustotalがrate limitなどなどで取得に失敗した場合はすこし待つ
+                        time.sleep(retry_sleep_seconds_virustotal)
+                    else:
+                        domain_info_dict["virus_total"] = info_virustotal["Webutation domain info"]
+                        # virustotalのrate limitにかからないように60/4 = 15秒ほど寝る
+                        # 制限は1分間に4クエリなのだから、1クエリにつき15秒まつのではなく、4クエリ投げたら1分待つ方が正当だが面倒なのでこうした
+                        time.sleep(interval_seconds_virustotal)
+                        break
+
             # 追加例：
             # geoip情報を付加する
             # if args.geoip:
