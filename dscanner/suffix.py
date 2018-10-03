@@ -46,11 +46,13 @@ def make_new_gtld(url):
 # TLDを付け替える
 def generate_domain(domain):
     tld_list = make_new_gtld(ICANN_URL)
-    if "www." in domain:
-        domain = "www." + domain.split(".")[1]
-    else:
-        domain = domain.split(".")[0]
-    check_list = [domain + "." + tld for tld in tld_list]
+    # if "www." in domain:
+    #     domain = "www." + domain.split(".")[1]
+    # else:
+    #     domain = domain.split(".")[0]
+
+    # 単純にTLDだけを付け替える実装にする（co.jp　→ co.xyz）
+    check_list = [".".join(domain.split(".")[:-1]) + "." + tld for tld in tld_list]
 
     return check_list
 
