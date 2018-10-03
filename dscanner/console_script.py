@@ -27,6 +27,7 @@ import urllib
 from urllib.request import urlopen
 from gglsbl import SafeBrowsingList
 import time
+from tqdm import tqdm
 
 def fetch_pdns_domain_info(domain_name, apikey):
     url = 'https://www.virustotal.com/vtapi/v2/domain/report'
@@ -35,6 +36,9 @@ def fetch_pdns_domain_info(domain_name, apikey):
 
     response_dict = json.loads(response)
     return response_dict
+
+def print_progress(progress_string):
+    print(progress_string)
 
 def main():
     # 引数の解釈の準備
@@ -48,13 +52,19 @@ def main():
     # URL候補を取得
     generator_dict = {}
     # TODO: 練習用にリストの長さを制限しているが、本番のときは制限をなくす
+    print_progress("generating qr ...")
     generator_dict["qr"]     = qr.near_urls(args.domain_name)[:1]
+    print_progress("generating suffix ...")
     generator_dict["suffix"] = suffix.generate_domain(args.domain_name)[:1]
+    print_progress("generating bit ...")
     generator_dict["bit"]   = bit.near_urls(args.domain_name)[:1]
+    print_progress("generating typo ...")
     generator_dict["typo"]  = typo.near_urls(args.domain_name)[:1]
     #domains_dict["homo"]   = homo.near_urls(domain)
     #domains_dict["combo"]  = combo.near_urls(domain)
     
+    print_progress("fetching domain info ...")
+
     # 辞書形式でドメインの情報らを持つ
     domains_dict = {}
     for generate_type_name, domain_list in generator_dict.items():
@@ -70,7 +80,7 @@ def main():
             domains_dict[domain_name]["generate_type"].append(generate_type_name)
 
     # ドメインに関する情報を調べ、記録していく
-    for domain_name, domain_info_dict in domains_dict.items():            
+    for domain_name, domain_info_dict in tqdm( domains_dict.items() ):            
             # httpレスポンス情報を付加する
             if args.http:
                 # TODO: httpステータスコードの取得をもっとマシなものにする
