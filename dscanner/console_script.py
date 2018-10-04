@@ -1,21 +1,12 @@
 import sys
 import argparse
 
-# 単体で実行するとき用
-#import qr
-#import suffix
-#import bit
-#import typo
-#import homo
-#import combo
-
-# 本番用
-from . import qr
-from . import suffix
-from . import bit
-from . import typo
-#from . import homo
-#from . import combo
+from dscanner import qr
+from dscanner import suffix
+from dscanner import bit
+from dscanner import typo
+#from dscanner import homo
+#from dscanner import combo
 
 import urllib.request
 import urllib.error
