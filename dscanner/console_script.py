@@ -79,12 +79,13 @@ def main():
     for domain_name, domain_info_dict in tqdm( domains_dict.items() ):            
             # httpレスポンス情報を付加する
             if args.http:
-                # TODO: httpステータスコードの取得をもっとマシなものにする
-                # https://stackoverflow.com/questions/1726402/in-python-how-do-i-use-urllib-to-see-if-a-website-is-404-or-200
                 http_status_code = 0
                 try:
-                    urllib.request.urlopen("http://" + domain_name, timeout=0.5)
+                    # 200番台のステータスコードを取得
+                    http_status_code = urllib.request.urlopen("http://" + domain_name,
+                                                              timeout=0.5).status
                 except urllib.error.HTTPError as e:
+                    # 200番台以外のステータスコードを取得
                     http_status_code = e.code
                 # connection refusedなどになった場合。後でもっとうまく変えたほうがよいかも
                 except urllib.error.URLError as e:
@@ -93,11 +94,8 @@ def main():
                     http_status_code = -1
                 except ConnectionResetError:
                     http_status_code = -1
-                else:
-                    # エラーにならないのは本当に200だけか...?301とかもあるかもしれないがとりあえず200
-                    http_status_code = 200
                 domain_info_dict["http_status_code"] = http_status_code
-            
+
             # Google Safe Brawsingの情報を取得
             if len(args.safe_site)>0:
                 api_key_gsb = args.safe_site
